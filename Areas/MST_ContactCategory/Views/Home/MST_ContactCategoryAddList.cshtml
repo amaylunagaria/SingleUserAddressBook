@@ -1,0 +1,32 @@
+﻿
+@{
+    ViewData["Title"] = "MST_ContactCategoryAddList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model MultiUserAB.Areas.MST_ContactCategory.Models.MST_ContactCategoryModel
+
+<div class="container-fluid row">
+    <div class="col-md-12">
+        @* <h3>@TempData["ContactCategoryInsertMessage"]</h3>*@
+        <form method="post" asp-area="MST_ContactCategory" asp-controller="Home" asp-action="Save">
+            @Html.HiddenFor(x=>x.ContactCategoryID)
+            <div>
+                <label><span class="text-danger">*</span>Contact Category Name</label>
+                <input type="text" class="form-control" asp-for="ContactCategoryName" placeholder="Enter the Contact Category" />
+                <span asp-validation-for="ContactCategoryName" class="text-danger"></span>
+            </div>
+
+            <hr />
+
+            <input type="submit" class="btn btn-success" />
+            <a type="submit" class="btn btn-danger" value="Cancel" asp-area="MST_ContactCategory" asp-controller="Home" asp-action="Index">Cancel</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

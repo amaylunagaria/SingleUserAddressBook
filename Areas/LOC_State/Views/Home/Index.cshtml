@@ -1,0 +1,106 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using System.Data
+@model DataTable
+
+<div class="col-md-12">
+    <div class="row">
+        <div class="col-md-3">
+            <h1 style="font-size: 35px">State List</h1>
+        </div>
+        <div class="col-md-7">
+            <nav class="navbar bg-white" style="background-color: ghostwhite">
+                <form class="form-inline">
+                    <input class="form-control mr-sm-2" style="width: 500px" id="StateTable" aria-controls="StateTable" type="search" placeholder="Search" aria-label="Search">
+                </form>
+            </nav>
+        </div>
+        <div class="col-md-2">
+            <a type="submit" asp-area="LOC_State" asp-controller="Home" asp-action="Add_Edit" class="text-white btn btn-success">Add</a>
+        </div>
+    </div>
+</div>
+
+<br />
+
+<div class="justify-content-evenly">
+    <form method="post" asp-area="LOC_State" asp-controller="Home" asp-action="Filter">
+        <div class="row">
+            <div class="col-md-4">
+                <input type="search" name="CountryName" class="form-control" placeholder="Country Name">
+            </div>
+            <div class="col-md-4">
+                <input type="search" name="StateName" class="form-control" placeholder="State Name">
+            </div>
+            <div class="col-md-4 d-flex">
+                <button type="submit" class="btn btn-dark mx-auto">Search</button>
+                <a class="btn btn-light" asp-area="LOC_State" asp-controller="Home" asp-action="Index">Clear Filter</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<hr />
+
+<table class="table table-striped text-center" id="StateTable">
+    <thead>
+        <tr>
+            <th style="font-weight:700; font-size: 20px">Country Name</th>
+            <th style="font-weight:700; font-size: 20px">State Name</th>
+            <th style="font-weight:700; font-size: 20px">Created</th>
+            <th style="font-weight:700; font-size: 20px">Modified</th>
+            <th>    </th>
+            <th>    </th>
+        </tr>
+    </thead>
+    <tbody id="Input">
+        @foreach (DataRow dr in Model.Rows)
+        {
+            <tr>
+                <td>@dr["CountryName"]</td>
+                <td>@dr["StateName"]</td>
+                <td>@Convert.ToDateTime(dr["CreationDate"]).ToString("D")</td>
+                <td>@Convert.ToDateTime(dr["ModificationDate"]).ToString("D")</td>
+                <td>
+                    <form method="post" asp-area="LOC_State" asp-controller="Home" asp-action="Delete">
+                        <input type="hidden" name="StateID" value="@Convert.ToInt32(dr["StateID"])" />
+                        <button type="submit" class="text-danger bg-light btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z" />
+                            </svg>
+                        </button>
+                    </form>
+                </td>
+                <td>
+                    <form method="post" asp-area="LOC_State" asp-controller="Home" asp-action="Add_Edit">
+                        <input type="hidden" name="StateID" value="@Convert.ToInt32(dr["StateID"])" />
+                        <button type="submit" class="text-primary bg-light btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+                            </svg>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $("#StateTable").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#Input tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+        });
+
+    </script>
+}

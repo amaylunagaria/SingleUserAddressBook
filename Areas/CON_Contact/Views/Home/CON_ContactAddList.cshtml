@@ -1,0 +1,159 @@
+﻿
+@{
+    ViewData["Title"] = "CON_ContactAddList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model MultiUserAB.Areas.CON_Contact.Models.CON_ContactModel
+
+<div class="container-fluid row">
+    <div class="col-md-12">
+        @*<h3>@TempData["ContactInsertMessage"]</h3>*@
+        <form method="post" asp-area="CON_Contact" asp-controller="Home" asp-action="Save" enctype="multipart/form-data">
+            @Html.HiddenFor(x=>x.ContactID)
+            <div class="mb-5">
+                <label><span class="text-danger">*</span>Name</label>
+                <input type="text" class="form-control" asp-for="Name" placeholder="Enter the Name" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="mb-5">
+                <label><span class="text-danger">*</span>Mobile</label>
+                <input type="number" class="form-control" asp-for="Mobile" placeholder="Enter the number" />
+                <span asp-validation-for="Mobile" class="text-danger"></span>
+            </div>
+
+            <div class="mb-5">
+                <label><span class="text-danger">*</span>Address</label>
+                <input type="textarea" class="form-control" asp-for="Address" placeholder="Enter the address" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+
+            <div class="mb-5">
+                <label><span class="text-danger">*</span>Email</label>
+                <input type="email" class="form-control" asp-for="Email" placeholder="Enter the email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-5">
+                <label><span class="text-danger">*</span>Contact Category Name</label>
+                <select class="form-control" asp-for="ContactCategoryID" placeholder="" asp-items="@(new SelectList(ViewBag.ContactCategoryList,"ContactCategoryID","ContactCategoryName"))">
+                    <option value="">Select Contact Category</option>
+                </select>
+                <span asp-validation-for="ContactCategoryID" class="text-danger"></span>
+            </div>
+
+            <div class="mb-5">
+                <label><span class="text-danger">*</span>Country Name</label>
+                <select class="form-control" asp-for="CountryID" asp-items="@(new SelectList(ViewBag.CountryList,"CountryID","CountryName"))" onchange="onStateChange();">
+                    <option value="">Select Country</option>
+                </select>
+                <span asp-validation-for="CountryID" class="text-danger"></span>
+            </div>
+
+            <div class="mb-5">
+                <label><span class="text-danger">*</span>State Name</label>
+                <select class="form-control" asp-for="StateID" placeholder="" asp-items="@(new SelectList(ViewBag.StateList,"StateID","StateName"))" onchange="onCityChange();">
+                    <option value="">Select State</option>
+                </select>
+                <span asp-validation-for="StateID" class="text-danger"></span>
+            </div>
+
+            <div class="mb-5">
+                <label><span class="text-danger">*</span>City Name</label>
+                <select type="text" class="form-control" asp-for="CityID" asp-items="@(new SelectList(ViewBag.CityList,"CityID","CityName"))" placeholder="">
+                    <option value="">Select City</option>
+                </select>
+                <span asp-validation-for="CityID" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <lable><span class="text-danger">*</span>Photo</lable>
+                <input type="file" class="form-control" asp-for="File" placeholder="Upload File" />
+                <span asp-validation-for="File" class="text-danger"></span>
+            </div>
+
+            @Html.HiddenFor(x=>x.CityID)
+            @Html.HiddenFor(x=>x.StateID)
+            @*@Html.HiddenFor(x=>x.File)
+            @Html.HiddenFor(x=>x.PhotoPath)*@
+
+            <hr />
+
+            <input type="submit" class="btn btn-success">
+            <a type="submit" class="btn btn-danger" value="Cancel" asp-area="CON_Contact" asp-controller="Home" asp-action="Index">Cancel</a>
+        </form>
+    </div>
+</div>
+
+<script>
+    function onStateChange() {
+        var CountryID = $("#CountryID").val();
+        
+
+        //console.log("country id", CountryID);
+        if (CountryID !== "") {
+        $("#StateID").empty();
+        $("#StateID").append($("<option></option>").val("").html("Select State"));
+        $("#CityID").empty();
+        $("#CityID").append($("<option></option>").val("").html("Select City"));
+            $.ajax(
+                {
+                    type: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    url: "@Url.Action("DropDownByCountry", "Home")" + "?&CountryID=" + CountryID,
+                    data: {},
+                    datatype: "json",
+                    success: function (Result) {
+                        $.each(Result,
+                            function (key, value) {
+                                $("#StateID").append($("<option></option>").val(value.stateID).html(value.stateName));
+                            });
+                    },
+                    error: function (r) {
+                        alert("Error while loading combobox.");
+                    }
+                });
+        }
+        else {
+            $("#StateID").empty();
+            $("#StateID").append($("<option></option>").val("").html("Select State"));
+        }
+    }
+
+    function onCityChange() {
+        var StateID = $("#StateID").val();
+        $("#CityID").empty();
+        $("#CityID").append($("<option></option>").val("").html("Select City"));
+
+        //console.log("state id", StateID);
+        if (StateID !== "") {
+            $.ajax(
+                {
+                    type: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    url: "@Url.Action("DropDownByState", "Home")" + "?&StateID=" + StateID,
+                    data: {},
+                    datatype: "json",
+                    success: function (Result) {
+                        $.each(Result,
+                            function (key, value) {
+                                $("#CityID").append($("<option></option>").val(value.cityID).html(value.cityName));
+                            });
+                    },
+                    error: function (r) {
+                        alert("Error while loading combobox.");
+                    }
+                });
+        }
+        else {
+            $("#CityID").empty();
+            $("#CityID").append($("<option></option>").val("").html("Select City"));
+        }
+    }
+</script>
+
+@section Scripts{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
